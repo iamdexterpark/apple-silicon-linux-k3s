@@ -1,0 +1,7 @@
+{
+  "run_list": ["recipe[node_base]"],
+  "node_base": {
+    "hostname": "node-3",
+    "net": { "address": "10.0.32.4/27" }
+  }
+}

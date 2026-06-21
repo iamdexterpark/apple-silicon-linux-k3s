@@ -1,0 +1,16 @@
+%% HERO — top of README, directly under the thesis.
+%% The whole story in one picture: a stock Mac mini crosses Apple's boot wall ONCE (manual),
+%% then everything is code — idempotent host converge, scripted K3s, a Ready cluster on the metal.
+flowchart LR
+    MAC["STOCK MAC MINI<br/>macOS · Apple Silicon"] -->|"manual, one-shot<br/>(1TR boot-policy sign)"| WALL{{"APPLE BOOT WALL<br/>no PXE · no IPMI · no UEFI"}}
+    WALL -->|"Asahi installer<br/>+ m1n1 stub"| LINUX["BARE-METAL LINUX<br/>Fedora Asahi Remix · kernel-16k"]
+    LINUX -->|"idempotent converge<br/>(Chef/Cinc)"| HOST["CONVERGED NODE<br/>net · firewall · ssh · kernel pin"]
+    HOST -->|"pinned installer"| K3S["K3s ON THE METAL<br/>node-1 control-plane + 2 workers"]
+    K3S -->|"declarative state"| READY["READY EDGE CLUSTER<br/>~7W/node · N+1 cold spare"]
+
+    style MAC fill:#7f8c8d,color:#fff,stroke:#34495e
+    style WALL fill:#c0392b,color:#fff,stroke:#7f1d1d
+    style LINUX fill:#8e44ad,color:#fff,stroke:#713f8f
+    style HOST fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style K3S fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style READY fill:#27ae60,color:#fff,stroke:#1e8449
