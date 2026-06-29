@@ -1,0 +1,14 @@
+%% LIFECYCLE — bare-metal node/cluster state machine. Each transition maps to a runbook.
+stateDiagram-v2
+    [*] --> Staged
+    Staged --> LinuxOnMetal: Asahi install + 1TR sign (profile rb 01-03)
+    LinuxOnMetal --> Converged: bootstrap + Chef converge (rb 04 / _common 05)
+    Converged --> Clustered: K3s server + agent join (profile rb 06)
+    Clustered --> Operating: acceptance passes (checkout)
+    Operating --> Operating: change host config -> re-converge (_common 05)
+    Operating --> Upgrading: drain -> dnf upgrade -> reboot -> uncordon (_common 07)
+    Upgrading --> Operating
+    Operating --> Degraded: node fails (CP loss = API down, workers run)
+    Degraded --> Operating: swap cold spare + restore etcd (profile rb 08)
+    Operating --> Decommissioned: drain -> wipe -> reset boot policy (_common 09)
+    Decommissioned --> [*]

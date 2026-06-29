@@ -1,0 +1,7 @@
+# Managed by node_base. Minimal chrony config for a headless edge node.
+<% @pools.each do |p| -%>
+pool <%= p %> iburst
+<% end -%>
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+rtcsync

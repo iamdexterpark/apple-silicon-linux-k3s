@@ -1,0 +1,25 @@
+%% ARCHITECTURE AT A GLANCE — the bring-up dependency chain, manual → idempotent → declarative.
+%% Each node maps to a script/runbook; the color band is the automation class.
+flowchart TD
+    PRE["precheck.sh<br/>(macOS: arm64 · FileVault off · space)"] --> ASAHI["install-asahi.sh<br/>(Asahi installer + m1n1 stub)"]
+    ASAHI --> TR{{"1TR boot-policy sign<br/>(manual, physical)"}}
+    TR --> BOOT["bootstrap.sh<br/>(first Linux boot: 16K kernel · NIC · pin · time)"]
+
+    BOOT --> CHEF["10-bootstrap-chef.sh<br/>(install cinc-client)"]
+    CHEF --> CONV["20-converge.sh<br/>(node_base: host · net · firewall · ssh · kernel pin)"]
+    CONV --> GATE["00-precheck.sh<br/>(host-config gate)"]
+
+    GATE --> SRV["30-install-k3s-server.sh<br/>(node-1: --cluster-init, etcd)"]
+    SRV --> AGT["40-install-k3s-agent.sh<br/>(node-2/3: join with token)"]
+    AGT --> CO["99-cluster-checkout.sh<br/>(acceptance: nodes Ready · SC · VIPs · DNS)"]
+
+    style PRE fill:#c0392b,color:#fff,stroke:#7f1d1d
+    style ASAHI fill:#c0392b,color:#fff,stroke:#7f1d1d
+    style TR fill:#c0392b,color:#fff,stroke:#7f1d1d
+    style BOOT fill:#c0392b,color:#fff,stroke:#7f1d1d
+    style CHEF fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style CONV fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style GATE fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style SRV fill:#16a085,color:#fff,stroke:#0e6655
+    style AGT fill:#16a085,color:#fff,stroke:#0e6655
+    style CO fill:#27ae60,color:#fff,stroke:#1e8449

@@ -1,0 +1,32 @@
+%% LLD TOPOLOGY — vendor-SPECIFIC. Named products, concrete (sanitized) addresses, 3-node shape.
+flowchart TB
+    subgraph Trunk ["Single trunked 1GbE per node — 3 VLANs"]
+        direction LR
+        V32["<b>NODES</b> VLAN 32 · 10.0.32.0/27<br/>K3s API · etcd · kubelet · Flannel · pod egress"]
+        V208["<b>SERVICES</b> VLAN 208 · 10.0.208.0/28<br/>MetalLB L2 — north-south VIPs"]
+        V224["<b>TELEMETRY</b> VLAN 224 · 10.0.224.0/29<br/>MetalLB L2 — receiver-only VIPs"]
+    end
+
+    subgraph Cluster ["3-node K3s · Fedora Asahi Remix (kernel-16k) on M1 Mac mini"]
+        K1["<b>node-1</b> · 10.0.32.2<br/>control-plane + worker<br/>embedded etcd (--cluster-init)<br/>Longhorn · MetalLB"]
+        K2["<b>node-2</b> · 10.0.32.3<br/>worker · Longhorn replica"]
+        K3["<b>node-3</b> · 10.0.32.4<br/>worker · Longhorn replica"]
+        KS["<b>node-spare</b><br/>cold spare (shelf)<br/>pre-staged, swap-in identity"]
+    end
+
+    OOB["PiKVM + switched PDU<br/>(out-of-band console/power)"]
+
+    V32 --- K1 & K2 & K3
+    V208 -. "tagged sub-if (announce only)" .- K1 & K2 & K3
+    V224 -. "tagged sub-if (announce only)" .- K1 & K2 & K3
+    KS -. "assume node-1 identity on failure" .- K1
+    OOB -. "HDMI + USB + power" .- K1 & K2 & K3
+
+    style K1 fill:#2c3e50,color:#fff,stroke:#1a252f
+    style K2 fill:#27ae60,color:#fff,stroke:#1e8449
+    style K3 fill:#27ae60,color:#fff,stroke:#1e8449
+    style KS fill:#7f8c8d,color:#fff,stroke:#34495e
+    style OOB fill:#34495e,color:#fff,stroke:#1a252f
+    style V32 fill:#2980b9,color:#fff,stroke:#1f6fa5
+    style V208 fill:#8e44ad,color:#fff,stroke:#713f8f
+    style V224 fill:#e67e22,color:#fff,stroke:#b9651a

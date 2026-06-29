@@ -1,0 +1,8 @@
+name             "node_base"
+maintainer        "Platform Engineering"
+maintainer_email  "platform@example.internal"
+license           "MIT"
+description        "Idempotent baseline for a bare-metal Fedora Asahi Remix node before it joins K3s: hostname, static NetworkManager connection, default-deny firewalld, key-only SSH, 16K-kernel pin, time sync."
+version           "1.0.0"
+chef_version      ">= 17.0"
+supports          "fedora"
